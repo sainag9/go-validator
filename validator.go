@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"fmt"
 	"github.com/sainag9/go-validator/models"
 	"reflect"
 	"strings"
@@ -26,7 +25,7 @@ func (v Validate) ValidateStruct(s interface{}) []models.ValidationError {
 	var sMetaData []models.StructMetaData
 	// initial(root) tag value is empty
 	metaData := getStructInfo(t, vl, sMetaData, "")
-	//fmt.Println(metaData)
+
 	var vErr []models.ValidationError
 	for _, m := range metaData {
 		tagArray := strings.Split(m.ValidationType, ",")
@@ -45,17 +44,16 @@ func getStructInfo(t reflect.Type, v reflect.Value, sArray []models.StructMetaDa
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		val := v.Field(i)
-		//fmt.Println("&&&&&&&&&&&&", tag, val, field)
+
 		if field.Type.Kind() == reflect.Struct {
 			//tag = tag + "." + field.Tag.Get(JSONTag)
 			sArray = getStructInfo(field.Type, val, sArray, tag+"."+field.Tag.Get(JSONTag))
-			fmt.Println("***********", sArray, tag)
+
 		} else if field.Type.Kind() == reflect.Array || field.Type.Kind() == reflect.Slice {
 			for j := 0; j < val.Len(); j++ {
 				vs := val.Convert(field.Type)
 				ts := vs.Index(j).Type()
 				//tag = tag + "." + field.Tag.Get(JSONTag)
-				//fmt.Println("$$$$$$", ts, vs, tag)
 				sArray = getStructInfo(ts, vs.Index(j), sArray, tag+"."+field.Tag.Get(JSONTag))
 			}
 		} else {
@@ -70,7 +68,6 @@ func getStructInfo(t reflect.Type, v reflect.Value, sArray []models.StructMetaDa
 			})
 		}
 	}
-	//fmt.Println("%%%%%%%%%%")
 	return sArray
 }
 
